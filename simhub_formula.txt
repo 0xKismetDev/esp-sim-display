@@ -1,0 +1,15 @@
+SimHub Custom Serial Device — NCalc Formula
+============================================
+
+Paste into: SimHub > Custom Serial Devices > [device] > Update messages > New message
+
+format([DataCorePlugin.GameData.NewData.SpeedKmh],'0') + ';' + isnull([DataCorePlugin.GameData.NewData.Gear],'N') + ';' + format([DataCorePlugin.GameData.NewData.Rpms],'0') + ';' + format([DataCorePlugin.GameData.NewData.MaxRpm],'0') + ';' + format([CarSettings_RPMRedLineSetting],'0')
+
+Update frequency: "When changes occur" (or 30-60 Hz fixed)
+
+Output example: 120;3;7500;9000;95
+  Field 1: Speed (km/h)
+  Field 2: Gear (N, R, 1-8)
+  Field 3: Current RPM
+  Field 4: Max RPM
+  Field 5: Redline as % of max RPM
