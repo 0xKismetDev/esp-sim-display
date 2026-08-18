@@ -1,0 +1,20 @@
+#pragma once
+#include <lvgl.h>
+
+#define C_BG lv_color_hex(0x0B0B0C)
+#define C_TEXT lv_color_hex(0xF2F2F4)
+#define C_MID lv_color_hex(0x8A8F98)
+#define C_DIM lv_color_hex(0x52565E)
+#define C_RULE lv_color_hex(0x1C1E22)
+#define C_WARN lv_color_hex(0xE0A94A)
+#define C_CRIT lv_color_hex(0xE14B4B)
+#define C_GREEN lv_color_hex(0x00FF00)
+#define C_YELLOW lv_color_hex(0xFFCC00)
+#define C_ORANGE lv_color_hex(0xFF8800)
+#define C_RED lv_color_hex(0xFF0000)
+#define C_DIM_GREEN lv_color_hex(0x002800)
+#define C_DIM_YELLOW lv_color_hex(0x282800)
+#define C_DIM_RED lv_color_hex(0x280000)
+#define C_WHITE lv_color_hex(0xFFFFFF)
+#define C_GREY lv_color_hex(0x666666)
+#define C_DARK lv_color_hex(0x1A1A1A)

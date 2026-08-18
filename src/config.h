@@ -1,0 +1,10 @@
+#pragma once
+
+#define LVGL_PORT_ROTATION_DEGREE 270
+#define SCREEN_W 480
+#define SCREEN_H 320
+#define SIM_NUM_FIELDS 26
+#define SIM_LIVE_MS 3000
+#define SIM_FRAME_MS 16
+#define SWITCH_LONG_PRESS_MS 700
+#define GESTURE_LIMIT_PX 28

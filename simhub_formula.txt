@@ -1,15 +1,7 @@
-SimHub Custom Serial Device — NCalc Formula
-============================================
+SimHub Custom Serial Device
 
-Paste into: SimHub > Custom Serial Devices > [device] > Update messages > New message
+Baud: 115200
+Maximum frequency: 60 Hz
+Format: NCalc
 
-format([DataCorePlugin.GameData.NewData.SpeedKmh],'0') + ';' + isnull([DataCorePlugin.GameData.NewData.Gear],'N') + ';' + format([DataCorePlugin.GameData.NewData.Rpms],'0') + ';' + format([DataCorePlugin.GameData.NewData.MaxRpm],'0') + ';' + format([CarSettings_RPMRedLineSetting],'0')
-
-Update frequency: "When changes occur" (or 30-60 Hz fixed)
-
-Output example: 120;3;7500;9000;95
-  Field 1: Speed (km/h)
-  Field 2: Gear (N, R, 1-8)
-  Field 3: Current RPM
-  Field 4: Max RPM
-  Field 5: Redline as % of max RPM
+'@' + format(isnull([DataCorePlugin.GameData.NewData.SpeedKmh],0),'0') + ';' + isnull([DataCorePlugin.GameData.NewData.Gear],'N') + ';' + format(isnull([DataCorePlugin.GameData.NewData.Rpms],0),'0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.MaxRpm],8000),'0') + ';' + format(isnull([CarSettings_RPMRedLineSetting],95),'0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.ABSLevel],-1),'0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TCLevel],-1),'0') + ';' + if(isnull([DataCorePlugin.GameData.NewData.ABSActive],false),1,0) + ';' + if(isnull([DataCorePlugin.GameData.NewData.TCActive],false),1,0) + ';' + format(isnull([DataCorePlugin.GameData.NewData.TyreTemperatureFrontLeft],0),'0.0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TyreTemperatureFrontRight],0),'0.0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TyreTemperatureRearLeft],0),'0.0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TyreTemperatureRearRight],0),'0.0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TyrePressureFrontLeft],0),'0.0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TyrePressureFrontRight],0),'0.0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TyrePressureRearLeft],0),'0.0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TyrePressureRearRight],0),'0.0') + ';' + if(isnull([DataCorePlugin.GameData.NewData.TyrePressureUnit],'psi') == 'bar',1,if(isnull([DataCorePlugin.GameData.NewData.TyrePressureUnit],'psi') == 'kPa',2,0)) + ';' + replace(format([DataCorePlugin.GameData.NewData.CurrentLapTime],'m\\:ss\\.fff'),'0:00.000','--:--.---') + ';' + replace(format([DataCorePlugin.GameData.NewData.LastLapTime],'m\\:ss\\.fff'),'0:00.000','--:--.---') + ';' + replace(format([DataCorePlugin.GameData.NewData.BestLapTime],'m\\:ss\\.fff'),'0:00.000','--:--.---') + ';' + if(isnull([PersistantTrackerPlugin.SessionBestLiveDeltaSeconds]),'x',format(round([PersistantTrackerPlugin.SessionBestLiveDeltaSeconds]*1000,0),'0')) + ';' + format(isnull([DataCorePlugin.GameData.NewData.CurrentLap],0),'0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.TotalLaps],0),'0') + ';' + format(isnull([DataCorePlugin.GameData.NewData.Position],0),'0') + ';' + replace(replace(replace(isnull([DataCorePlugin.GameData.NewData.TrackName],'NO TRACK'),';',' '),'@',' '),'#',' ') + '#'
