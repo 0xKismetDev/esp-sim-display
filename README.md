@@ -23,3 +23,5 @@ pio run -t upload
 Create a Custom Serial Device at 115200 baud. Add an NCalc update message using [simhub_formula.txt](simhub_formula.txt) and set its maximum frequency to 60 Hz.
 
 The framed protocol carries speed, RPM, assists, tire data and lap timing. Missing game telemetry is shown as `--`.
+
+Rendering is paced to leave touch-sampling time between the panel's full-frame transfers.
