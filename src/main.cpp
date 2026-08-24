@@ -9,25 +9,40 @@ extern "C"
 }
 
 #include "config.h"
+#include "sim_controls.h"
 #include "sim_screen.h"
 #include "telemetry.h"
 
 SimTelemetry g_sim;
 
-static lv_obj_t *screens[4];
+static constexpr int SCREEN_COUNT = 5;
+static lv_obj_t *screens[SCREEN_COUNT];
 static int mode = 0;
 static volatile int switch_request = 0;
+static uint32_t last_navigation_request_ms = 0;
+
+static void request_screen_switch(int direction)
+{
+    uint32_t now = millis();
+    // Loading a new screen while the finger is still moving can make LVGL
+    // classify the tail of the same swipe on that screen. Accept at most one
+    // navigation request per physical gesture/long press.
+    if (last_navigation_request_ms != 0 &&
+        now - last_navigation_request_ms < NAVIGATION_COOLDOWN_MS) return;
+    last_navigation_request_ms = now;
+    switch_request = direction;
+}
 
 static void gesture_cb(lv_event_t *)
 {
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
-    if (dir == LV_DIR_LEFT) switch_request = 1;
-    else if (dir == LV_DIR_RIGHT) switch_request = -1;
+    if (dir == LV_DIR_LEFT) request_screen_switch(1);
+    else if (dir == LV_DIR_RIGHT) request_screen_switch(-1);
 }
 
 static void longpress_cb(lv_event_t *)
 {
-    switch_request = 1;
+    request_screen_switch(1);
 }
 
 static void make_touch_transparent(lv_obj_t *obj)
@@ -53,22 +68,25 @@ static void update_active()
     if (mode == 0) sim_screen_update();
     else if (mode == 1) sim_gt_screen_update();
     else if (mode == 2) sim_tyres_screen_update();
-    else sim_timing_screen_update();
+    else if (mode == 3) sim_timing_screen_update();
+    else sim_controls_screen_update();
 }
 
 static void switch_mode(int direction)
 {
     int previous = mode;
-    mode = (mode + direction + 4) % 4;
-    lv_scr_load_anim(screens[mode], direction > 0 ? LV_SCR_LOAD_ANIM_MOVE_LEFT
-                                                  : LV_SCR_LOAD_ANIM_MOVE_RIGHT,
-                     180, 0, false);
+    mode = (mode + direction + SCREEN_COUNT) % SCREEN_COUNT;
+    // A full-screen animated transition continuously flushes this panel and
+    // starves touch sampling for the duration. An immediate load keeps input
+    // available and makes consecutive swipes deterministic.
+    lv_scr_load(screens[mode]);
     update_active();
     Serial.printf("[mode] %d -> %d\n", previous, mode);
 }
 
 void setup()
 {
+    sim_controls_begin();
     Serial.begin(115200);
     delay(100);
 
@@ -93,7 +111,11 @@ void setup()
     screens[1] = sim_gt_screen_create();
     screens[2] = sim_tyres_screen_create();
     screens[3] = sim_timing_screen_create();
-    for (lv_obj_t *screen : screens) attach_navigation(screen);
+    screens[4] = sim_controls_screen_create();
+    for (int i = 0; i < SCREEN_COUNT - 1; ++i) attach_navigation(screens[i]);
+    // Keep control buttons clickable. Gestures that begin outside a button still
+    // navigate, while a tap can never also trigger the long-press page action.
+    lv_obj_add_event_cb(screens[4], gesture_cb, LV_EVENT_GESTURE, nullptr);
 
     lv_indev_t *indev = lv_indev_get_next(nullptr);
     if (indev) {
@@ -109,6 +131,7 @@ void setup()
 void loop()
 {
     while (Serial.available()) sim_feed(Serial.read());
+    sim_controls_task();
 
     if (switch_request != 0) {
         int request = switch_request;
